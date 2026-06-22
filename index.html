@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Quantum Tracker | Daily Progress</title>
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --glow-cyan: #58a6ff;
+            --glow-green: #2ea44f;
+            --accent-purple: #bc8cff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 5px;
+            background: linear-gradient(45deg, var(--glow-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .date-subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        /* Progress Ring / Bar Styling */
+        .progress-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .progress-text {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--glow-cyan);
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .progress-bar-bg {
+            background: #21262d;
+            border-radius: 10px;
+            height: 12px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(90deg, var(--glow-cyan), var(--glow-green));
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Task List Styling */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #21262d;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            transition: all 0.2s ease;
+        }
+
+        .task-item:hover {
+            border-color: #8b949e;
+            transform: translateX(2px);
+        }
+
+        .task-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            flex-grow: 1;
+        }
+
+        .task-item.completed {
+            border-color: rgba(46, 164, 79, 0.4);
+            background: rgba(46, 164, 79, 0.05);
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            background-color: transparent;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input[type="checkbox"]:checked {
+            background-color: var(--glow-green);
+            border-color: var(--glow-green);
+        }
+
+        input[type="checkbox"]:checked:after {
+            content: '\2714';
+            font-size: 12px;
+            position: absolute;
+            top: -1px;
+            left: 3px;
+            color: white;
+        }
+
+        .task-text {
+            font-size: 15px;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: #f85149;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+            background: rgba(248, 81, 73, 0.1);
+        }
+
+        /* Inputs & Buttons */
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            background-color: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.3);
+        }
+
+        button.action-btn {
+            background-color: #21262d;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button.action-btn:hover {
+            background-color: #30363d;
+            border-color: #8b949e;
+        }
+
+        button.primary-btn {
+            background-color: var(--glow-green);
+            border-color: rgba(240, 246, 252, 0.1);
+            color: white;
+        }
+
+        button.primary-btn:hover {
+            background-color: #2c974b;
+        }
+
+        .cloud-section {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Daily Core Metrics</h1>
+    <div class="date-subtitle" id="currentDate">Tracking Progress</div>
+
+    <div class="progress-container">
+        <div class="progress-text" id="percentageDisplay">0%</div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <input type="text" id="newTaskInput" placeholder="Add custom trackable layer (e.g., Quantum Computing)...">
+        <button class="action-btn primary-btn" onclick="addNewTask()">Add</button>
+    </div>
+
+    <div class="task-list" id="taskListContainer">
+        <!-- Dynamic tasks injection -->
+    </div>
+
+    <div class="cloud-section">
+        <button class="action-btn" onclick="resetDay()">Reset Day</button>
+        <button class="action-btn primary-btn" onclick="syncToCloud()">Backup Progress Data</button>
+    </div>
+</div>
+
+<script>
+    // 1. Initial baseline choices dictated by your workflow
+    const defaultTasks = [
+        "Waking at 6 AM",
+        "Calisthenics",
+        "Coding",
+        "Quantum Mechanics",
+        "Cybersecurity",
+        "Python",
+        "C++"
+    ];
+
+    let currentTasks = [];
+
+    // Load data structural logic from local browser memory
+    function initData() {
+        const stored = localStorage.getItem('quantum_tracker_tasks');
+        if (stored) {
+            currentTasks = JSON.parse(stored);
+        } else {
+            currentTasks = defaultTasks.map(name => ({ name: name, completed: false, isDefault: true }));
+            saveToLocalStorage();
+        }
+        
+        // Show Current System Date
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-US', options);
+        
+        renderTasks();
+    }
+
+    function renderTasks() {
+        const container = document.getElementById('taskListContainer');
+        container.innerHTML = '';
+
+        currentTasks.forEach((task, index) => {
+            const item = document.createElement('div');
+            item.className = `task-item ${task.completed ? 'completed' : ''}`;
+
+            item.innerHTML = `
+                <div class="task-left" onclick="toggleTask(${index})">
+                    <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="event.stopPropagation(); toggleTask(${index});">
+                    <span class="task-text">${task.name}</span>
+                </div>
+                ${!task.isDefault ? `<button class="delete-btn" onclick="deleteTask(${index})">Remove</button>` : ''}
+            `;
+            container.appendChild(item);
+        });
+
+        calculateMetrics();
+    }
+
+    function toggleTask(index) {
+        currentTasks[index].completed = !currentTasks[index].completed;
+        saveToLocalStorage();
+        renderTasks();
+    }
+
+    function addNewTask() {
+        const input = document.getElementById('newTaskInput');
+        const text = input.value.trim();
+        if (text === '') return;
+
+        currentTasks.push({ name: text, completed: false, isDefault: false });
+        input.value = '';
+        saveToLocalStorage();
+        renderTasks();
+    }
+
+    function deleteTask(index) {
+        currentTasks.splice(index, 1);
+        saveToLocalStorage();
+        renderTasks();
+    }
+
+    function calculateMetrics() {
+        if (currentTasks.length === 0) {
+            document.getElementById('percentageDisplay').innerText = '0%';
+            document.getElementById('progressBar').style.width = '0%';
+            return;
+        }
+
+        const completedCount = currentTasks.filter(t => t.completed).length;
+        const percentage = Math.round((completedCount / currentTasks.length) * 100);
+
+        document.getElementById('percentageDisplay').innerText = `${percentage}%`;
+        document.getElementById('progressBar').style.width = `${percentage}%`;
+    }
+
+    function saveToLocalStorage() {
+        localStorage.setItem('quantum_tracker_tasks', JSON.stringify(currentTasks));
+    }
+
+    function resetDay() {
+        if(confirm("Reset all tracked completions for the day?")) {
+            currentTasks.forEach(t => t.completed = false);
+            saveToLocalStorage();
+            renderTasks();
+        }
+    }
+
+    // Portable Cloud/Local File Sync Logic
+    function syncToCloud() {
+        const dataPayload = {
+            date: new Date().toISOString().split('T')[0],
+            metrics: currentTasks,
+            completionRate: document.getElementById('percentageDisplay').innerText
+        };
+        
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataPayload, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `metrics_snapshot_${dataPayload.date}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+    }
+
+    // Boot system
+    initData();
+</script>
+</body>
+</html>
